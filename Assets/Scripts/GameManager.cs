@@ -8,20 +8,10 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance;
 
     public string playerName;
+    public int highScore = 0;
+    public string highScoreName;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-    //Instantiate Game Manager if one doesn't exist, destroy if one does
+    //Instantiate Game Manager, LoadScore Information
     private void Awake()
     {
         if (Instance != null)
@@ -32,25 +22,28 @@ public class GameManager : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
+        LoadHighScore();
     }
 
     [System.Serializable]
     class SaveData
     {
-        //public Color TeamColor;
+        public string highScoreName;
+        public int highScore;
     }
 
-    public void SaveScore()
+    public void SaveHighScore()
     {
         SaveData data = new SaveData();
-        //data.TeamColor = TeamColor;
+        data.highScore = highScore;
+        data.highScoreName = highScoreName;
 
         string json = JsonUtility.ToJson(data);
 
         File.WriteAllText(Application.persistentDataPath + "/savefile.json", json);
     }
 
-    public void LoadScore()
+    public void LoadHighScore()
     {
         string path = Application.persistentDataPath + "/savefile.json";
         if (File.Exists(path))
@@ -58,7 +51,8 @@ public class GameManager : MonoBehaviour
             string json = File.ReadAllText(path);
             SaveData data = JsonUtility.FromJson<SaveData>(json);
 
-            //TeamColor = data.TeamColor;
+            highScore = data.highScore;
+            highScoreName = data.highScoreName;
         }
     }
 }

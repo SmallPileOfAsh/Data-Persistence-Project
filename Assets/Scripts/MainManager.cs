@@ -10,6 +10,7 @@ public class MainManager : MonoBehaviour
     public int LineCount = 6;
     public Rigidbody Ball;
 
+    public Text HighScoreText;
     public Text ScoreText;
     public GameObject GameOverText;
     
@@ -22,7 +23,7 @@ public class MainManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        ScoreText.text = GameManager.Instance.playerName + "'s Score: " + m_Points;
+        SetupUI();
 
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
@@ -64,22 +65,65 @@ public class MainManager : MonoBehaviour
         }
     }
 
+    void SetupUI()
+    {
+        UpdateScoreName();
+        UpdateHighScore();  
+    }
+
     void AddPoint(int point)
     {
         m_Points += point;
+        UpdateScoreName();
+        
+    }
+
+    //Update High Score Text
+    private void UpdateHighScore()
+    {
         if (GameManager.Instance != null)
+        {
+            if (GameManager.Instance.highScore == 0)
+            {
+                HighScoreText.text = "Best Score: None: 0";
+            }
+            else
+            {
+                HighScoreText.text = "Best Score: " + GameManager.Instance.highScoreName + ": " + GameManager.Instance.highScore;
+            }
+        }
+        else
+        {
+            HighScoreText.text = HighScoreText.text = "Best Score: UNKNOWN: UNKNOWN";
+        }
+        
+    }
+
+    //Update Score Text
+    void UpdateScoreName()
+    {
+        if (GameManager.Instance != null && GameManager.Instance.playerName != "")
         {
             ScoreText.text = GameManager.Instance.playerName + "'s Score: " + m_Points;
         }
         else
         {
-            ScoreText.text = GameManager.Instance.playerName + "Score: " + m_Points;
+            ScoreText.text = "???'s " + "Score: " + m_Points;
         }
-        
     }
 
+    //Handle Gameover
     public void GameOver()
     {
+        if (GameManager.Instance != null)
+        {
+            if (m_Points > GameManager.Instance.highScore)
+        {
+                GameManager.Instance.highScore = m_Points;
+                GameManager.Instance.highScoreName = GameManager.Instance.playerName;
+                GameManager.Instance.SaveHighScore();
+            }
+        }
         m_GameOver = true;
         GameOverText.SetActive(true);
     }
